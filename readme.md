@@ -97,8 +97,9 @@ JWT_SECRET=your_jwt_secret
 ```
 
 4. Start the development server
-
+```bash
 npm run dev
+```
 
 ## Contributors
 
