@@ -7,4 +7,10 @@ const UserSchema = new mongoose.Schema({
     streaks: Number,
     badges: [String],
     isAnonymous: Boolean,
+    lastActivity: {
+        type: Date,
+        default: Date.now
+    }
 });
+
+module.exports = mongoose.model('User', UserSchema);
