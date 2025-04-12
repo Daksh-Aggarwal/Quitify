@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Addiction Tracker | Mental Health Support</title>
+    <link rel="stylesheet" href="/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo">Mental Wellness</div>
+      <div class="nav-links">
+        <a href="index.html"><span class="nav-icon">🏠</span>Home</a>
+        <a href="profile.html"><span class="nav-icon">👤</span>Profile</a>
+        <a href="community.html"><span class="nav-icon">👥</span>Community</a>
+        <a href="addiction-tracker.html" class="active"><span class="nav-icon">📊</span>Recovery Tracker</a>
+      </div>
+      <div class="emergency-contact">
+        Emergency Helpline: <a href="tel:+1-800-123-4567">1-800-123-4567</a>
+      </div>
+      <button class="mobile-menu-btn">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </button>
+    </nav>
+
+    <main>
+      <section class="tracker-hero">
+        <div class="hero-content">
+          <h1>Your Recovery Journey</h1>
+          <p>Track your progress, celebrate milestones, and stay accountable</p>
+        </div>
+      </section>
+
+      <!-- Set Recovery Goal Section -->
+      <section class="set-goal-section">
+        <div class="container">
+          <div class="goal-header">
+            <h2>Set Your Recovery Goal</h2>
+            <p>What addiction are you working to overcome?</p>
+          </div>
+          
+          <div class="goal-form">
+            <form id="addictionForm">
+              <div class="form-group">
+                <label for="addictionType">I want to overcome:</label>
+                <select id="addictionType" required>
+                  <option value="">Select an addiction</option>
+                  <option value="Smoking">Smoking</option>
+                  <option value="Alcohol">Alcohol</option>
+                  <option value="Social Media">Social Media</option>
+                  <option value="Gambling">Gambling</option>
+                  <option value="Sugar">Sugar</option>
+                  <option value="Other">Other (specify)</option>
+                </select>
+                <div id="otherAddictionContainer" style="display: none;">
+                  <label for="otherAddiction">Please specify:</label>
+                  <input type="text" id="otherAddiction" placeholder="Enter addiction type">
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="motivationLevel">Motivation Level:</label>
+                <div class="slider-container">
+                  <input type="range" min="1" max="10" value="7" id="motivationLevel" class="slider">
+                  <div class="slider-value"><span id="motivationValue">7</span>/10</div>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="recoveryGoal">My Recovery Goal:</label>
+                <textarea id="recoveryGoal" placeholder="What do you hope to achieve? What's your 'why'?" rows="3"></textarea>
+              </div>
+              
+              <div class="form-buttons">
+                <button type="submit" id="saveGoalBtn" class="primary-btn">Save Goal</button>
+                <button type="reset" class="secondary-btn">Reset</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Current Goal & Progress Tracking -->
+      <section class="progress-section" id="progressSection" style="display: none;">
+        <div class="container">
+          <div class="progress-header">
+            <h2>Your Recovery Progress</h2>
+            <div class="goal-display">
+              <div class="goal-tag" id="addictionDisplay">Overcoming: <span></span></div>
+              <div class="goal-tag" id="startDateDisplay">Since: <span></span></div>
+              <button id="editGoalBtn" class="edit-btn">Edit Goal</button>
+            </div>
+          </div>
+          
+          <div class="progress-tracker">
+            <div class="days-counter">
+              <div class="counter-circle">
+                <h3 id="dayCount">0</h3>
+                <span>days</span>
+              </div>
+              <div class="streak-label">Clean Streak</div>
+            </div>
+            
+            <div class="milestone-cards">
+              <div class="milestone-card" data-days="7">
+                <div class="milestone-icon">🌱</div>
+                <h4>Week 1</h4>
+                <p>Beginning of healing</p>
+                <div class="milestone-tag">7 days</div>
+              </div>
+              <div class="milestone-card" data-days="30">
+                <div class="milestone-icon">🌿</div>
+                <h4>Month 1</h4>
+                <p>New habits forming</p>
+                <div class="milestone-tag">30 days</div>
+              </div>
+              <div class="milestone-card" data-days="90">
+                <div class="milestone-icon">🌲</div>
+                <h4>3 Months</h4>
+                <p>Growing stronger</p>
+                <div class="milestone-tag">90 days</div>
+              </div>
+              <div class="milestone-card" data-days="365">
+                <div class="milestone-icon">🌳</div>
+                <h4>1 Year</h4>
+                <p>Transformation</p>
+                <div class="milestone-tag">365 days</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="tracking-tools">
+            <div class="tool-header">
+              <h3>Daily Check-in</h3>
+              <p>Record your progress and challenges every day</p>
+            </div>
+            
+            <div class="check-in-form">
+              <div class="form-group">
+                <label>Today I am feeling:</label>
+                <div class="mood-selector">
+                  <button type="button" class="mood-btn" data-mood="😊" title="Happy">😊</button>
+                  <button type="button" class="mood-btn" data-mood="😌" title="Content">😌</button>
+                  <button type="button" class="mood-btn" data-mood="😐" title="Neutral">😐</button>
+                  <button type="button" class="mood-btn" data-mood="😟" title="Worried">😟</button>
+                  <button type="button" class="mood-btn" data-mood="😩" title="Struggling">😩</button>
+                </div>
+                <input type="hidden" id="selectedMood" value="">
+              </div>
+              
+              <div class="form-group">
+                <label for="checkInNotes">Notes about today:</label>
+                <textarea id="checkInNotes" placeholder="What went well? What was challenging? Any triggers?" rows="3"></textarea>
+              </div>
+              
+              <div class="form-buttons">
+                <button id="saveCheckInBtn" class="primary-btn">Save Check-in</button>
+              </div>
+            </div>
+            
+            <div class="check-in-history">
+              <h4>Recent Check-ins</h4>
+              <div id="checkInList" class="history-list">
+                <!-- Check-ins will be populated here -->
+                <div class="empty-state">
+                  <p>No check-ins recorded yet. Start tracking your journey today!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Recovery Community Leaderboard -->
+      <section class="leaderboard-section">
+        <div class="container">
+          <h2>Recovery Champions</h2>
+          <p class="section-intro">See how everyone is progressing on their recovery journeys. Supporting each other leads to greater success!</p>
+          
+          <div class="leaderboard-filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="Smoking">Smoking</button>
+            <button class="filter-btn" data-filter="Alcohol">Alcohol</button>
+            <button class="filter-btn" data-filter="Social Media">Social Media</button>
+            <button class="filter-btn" data-filter="Other">Other</button>
+          </div>
+          
+          <div class="leaderboard-container">
+            <div class="leaderboard-header">
+              <div class="rank-header">Rank</div>
+              <div class="user-header">User</div>
+              <div class="addiction-header">Recovery Goal</div>
+              <div class="streak-header">Clean Days</div>
+              <div class="achievement-header">Milestone</div>
+            </div>
+            
+            <div class="leaderboard-body" id="leaderboardList">
+              <!-- Leaderboard entries populated dynamically -->
+              <div class="leaderboard-entry">
+                <div class="rank"><span class="rank-number">1</span></div>
+                <div class="user">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=1" alt="User avatar">
+                  <span>Sarah M.</span>
+                </div>
+                <div class="addiction">Smoking</div>
+                <div class="streak">186 days</div>
+                <div class="achievement">
+                  <div class="achievement-tag">6 Month Milestone 🏆</div>
+                </div>
+              </div>
+              
+              <div class="leaderboard-entry">
+                <div class="rank"><span class="rank-number">2</span></div>
+                <div class="user">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=2" alt="User avatar">
+                  <span>John D.</span>
+                </div>
+                <div class="addiction">Alcohol</div>
+                <div class="streak">120 days</div>
+                <div class="achievement">
+                  <div class="achievement-tag">3 Month Milestone 🏆</div>
+                </div>
+              </div>
+              
+              <div class="leaderboard-entry">
+                <div class="rank"><span class="rank-number">3</span></div>
+                <div class="user">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=3" alt="User avatar">
+                  <span>Emily R.</span>
+                </div>
+                <div class="addiction">Social Media</div>
+                <div class="streak">90 days</div>
+                <div class="achievement">
+                  <div class="achievement-tag">3 Month Milestone 🏆</div>
+                </div>
+              </div>
+              
+              <div class="leaderboard-entry">
+                <div class="rank"><span class="rank-number">4</span></div>
+                <div class="user">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=4" alt="User avatar">
+                  <span>Michael K.</span>
+                </div>
+                <div class="addiction">Gambling</div>
+                <div class="streak">65 days</div>
+                <div class="achievement">
+                  <div class="achievement-tag">2 Month Milestone 🏆</div>
+                </div>
+              </div>
+              
+              <div class="leaderboard-entry">
+                <div class="rank"><span class="rank-number">5</span></div>
+                <div class="user">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=5" alt="User avatar">
+                  <span>Lisa T.</span>
+                </div>
+                <div class="addiction">Sugar</div>
+                <div class="streak">45 days</div>
+                <div class="achievement">
+                  <div class="achievement-tag">1 Month Milestone 🏆</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="view-more-container">
+              <button class="view-more-btn">View More</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Supportive Resources Section -->
+      <section class="resources-section">
+        <div class="container">
+          <h2>Recovery Resources</h2>
+          <p class="section-intro">Helpful tools and information for your recovery journey</p>
+          
+          <div class="resources-grid">
+            <div class="resource-card">
+              <div class="resource-icon">📞</div>
+              <h3>Helplines</h3>
+              <p>24/7 support when you need someone to talk to</p>
+              <a href="#" class="resource-link">View Helplines</a>
+            </div>
+            
+            <div class="resource-card">
+              <div class="resource-icon">👥</div>
+              <h3>Support Groups</h3>
+              <p>Connect with others on similar journeys</p>
+              <a href="#" class="resource-link">Find Groups</a>
+            </div>
+            
+            <div class="resource-card">
+              <div class="resource-icon">📚</div>
+              <h3>Educational Content</h3>
+              <p>Learn about addiction and recovery</p>
+              <a href="#" class="resource-link">Browse Resources</a>
+            </div>
+            
+            <div class="resource-card">
+              <div class="resource-icon">🧠</div>
+              <h3>Coping Strategies</h3>
+              <p>Techniques to manage cravings and triggers</p>
+              <a href="#" class="resource-link">Learn Strategies</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>Contact Us</h4>
+          <p>Email: support@mentalwellness.com</p>
+          <p>Phone: 1-800-123-4567</p>
+        </div>
+        <div class="footer-section">
+          <h4>Emergency</h4>
+          <p>If you're in crisis, please call our 24/7 helpline</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Mental Wellness. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script type="module" src="/main.js"></script>
+    <script type="module" src="/addiction-tracker.js"></script>
+  </body>
+</html>
