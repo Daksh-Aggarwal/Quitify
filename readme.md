@@ -78,27 +78,28 @@ Quitify is a web application designed to create a supportive environment where u
 ### Installation
 
 1. Clone the repository
-
+```bash
 git clone https://github.com/yourusername/quitify.git
 cd quitify
-
+```
 
 2. Install dependencies
-
+```bash
 npm install
-
+```
 
 3. Configure environment variables
 Create a .env file in the root directory with:
-
+```bash
 PORT=3000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
-
+```
 
 4. Start the development server
-
+```bash
 npm run dev
+```
 
 ## Contributors
 
