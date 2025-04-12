@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Profile | Mental Health Support</title>
+    <link rel="stylesheet" href="/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo">Mental Wellness</div>
+      <div class="nav-links">
+        <a href="index.html"><span class="nav-icon">🏠</span>Home</a>
+        <a href="profile.html" class="active"><span class="nav-icon">👤</span>Profile</a>
+        <a href="community.html"><span class="nav-icon">👥</span>Community</a>
+        <a href="addiction-tracker.html"><span class="nav-icon">📊</span>Recovery Tracker</a>
+      </div>
+      <div class="emergency-contact">
+        Emergency Helpline: <a href="tel:+1-800-123-4567">1-800-123-4567</a>
+      </div>
+      <button class="mobile-menu-btn">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </button>
+    </nav>
+
+    <main>
+      <section class="profile-header">
+        <div class="profile-cover"></div>
+        <div class="profile-info">
+          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=123" alt="Profile" class="profile-avatar">
+          <div class="profile-details">
+            <h1>Alex Johnson</h1>
+            <p>Member since January 2024</p>
+            <div class="profile-stats">
+              <div class="stat">
+                <span class="stat-number">45</span>
+                <span class="stat-label">Day Streak</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number">120</span>
+                <span class="stat-label">Posts</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number">350</span>
+                <span class="stat-label">Supporters</span>
+              </div>
+            </div>
+            <div class="profile-actions">
+              <button class="profile-btn edit-profile">Edit Profile</button>
+              <button class="profile-btn share-profile">Share Profile</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="badges-section">
+        <h2>Your Achievements</h2>
+        <div class="badges-grid">
+          <div class="badge">
+            <span class="badge-icon">🎯</span>
+            <h3>30 Day Streak</h3>
+            <p>Completed 30 days of continuous engagement</p>
+          </div>
+          <div class="badge">
+            <span class="badge-icon">🌟</span>
+            <h3>Supportive Friend</h3>
+            <p>Helped 50+ community members</p>
+          </div>
+          <div class="badge">
+            <span class="badge-icon">📝</span>
+            <h3>Story Sharer</h3>
+            <p>Published 25 inspiring posts</p>
+          </div>
+          <div class="badge">
+            <span class="badge-icon">💪</span>
+            <h3>Warrior</h3>
+            <p>Overcame significant challenges</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="journey-section">
+        <div class="journey-header">
+          <h2>Your Journey</h2>
+          <div class="journey-filters">
+            <button class="journey-filter active" data-filter="all">All Memories</button>
+            <button class="journey-filter" data-filter="milestones">Milestones</button>
+            <button class="journey-filter" data-filter="reflections">Reflections</button>
+            <button class="journey-filter" data-filter="gratitude">Gratitude</button>
+          </div>
+        </div>
+        
+        <div class="timeline-container">
+          <div class="timeline-line"></div>
+          
+          <div class="journey-posts">
+            <div class="time-marker">
+              <div class="time-dot"></div>
+              <span class="time-label">This Week</span>
+            </div>
+            
+            <div class="memory-card milestone" data-category="milestones">
+              <div class="memory-header">
+                <div class="memory-date">
+                  <div class="memory-day">14</div>
+                  <div class="memory-month">APR</div>
+                </div>
+                <div class="memory-category">
+                  <span class="category-badge milestone">Milestone</span>
+                </div>
+                <div class="memory-mood">😊</div>
+              </div>
+              
+              <div class="memory-content">
+                <p>Feeling grateful for this amazing community. Your support means everything! 💕</p>
+                <div class="memory-image-container">
+                  <img src="https://source.unsplash.com/random/600x400/?community" alt="Community support" class="memory-image">
+                </div>
+              </div>
+              
+              <div class="memory-footer">
+                <div class="memory-stats">
+                  <span class="stat-item"><i class="stat-icon">❤️</i> 24 likes</span>
+                  <span class="stat-item"><i class="stat-icon">💭</i> 8 comments</span>
+                </div>
+                <div class="memory-actions">
+                  <button class="memory-action-btn"><i class="action-icon">📝</i> Edit</button>
+                  <button class="memory-action-btn"><i class="action-icon">✨</i> Highlight</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="memory-card reflection" data-category="reflections">
+              <div class="memory-header">
+                <div class="memory-date">
+                  <div class="memory-day">11</div>
+                  <div class="memory-month">APR</div>
+                </div>
+                <div class="memory-category">
+                  <span class="category-badge reflection">Reflection</span>
+                </div>
+                <div class="memory-mood">🧘‍♂️</div>
+              </div>
+              
+              <div class="memory-content">
+                <p>Just completed my first meditation session. Small steps lead to big changes! 🧘‍♂️</p>
+              </div>
+              
+              <div class="memory-footer">
+                <div class="memory-stats">
+                  <span class="stat-item"><i class="stat-icon">❤️</i> 36 likes</span>
+                  <span class="stat-item"><i class="stat-icon">💭</i> 15 comments</span>
+                </div>
+                <div class="memory-actions">
+                  <button class="memory-action-btn"><i class="action-icon">📝</i> Edit</button>
+                  <button class="memory-action-btn"><i class="action-icon">✨</i> Highlight</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="time-marker">
+              <div class="time-dot"></div>
+              <span class="time-label">Last Month</span>
+            </div>
+            
+            <div class="memory-card gratitude" data-category="gratitude">
+              <div class="memory-header">
+                <div class="memory-date">
+                  <div class="memory-day">28</div>
+                  <div class="memory-month">MAR</div>
+                </div>
+                <div class="memory-category">
+                  <span class="category-badge gratitude">Gratitude</span>
+                </div>
+                <div class="memory-mood">🙏</div>
+              </div>
+              
+              <div class="memory-content">
+                <p>Today I'm grateful for the little moments of peace I found during a hectic day. Sometimes the small things matter most.</p>
+              </div>
+              
+              <div class="memory-footer">
+                <div class="memory-stats">
+                  <span class="stat-item"><i class="stat-icon">❤️</i> 42 likes</span>
+                  <span class="stat-item"><i class="stat-icon">💭</i> 7 comments</span>
+                </div>
+                <div class="memory-actions">
+                  <button class="memory-action-btn"><i class="action-icon">📝</i> Edit</button>
+                  <button class="memory-action-btn"><i class="action-icon">✨</i> Highlight</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="journey-add-container">
+          <button class="add-memory-btn">
+            <span class="btn-icon">+</span>
+            <span class="btn-text">Create New Memory</span>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>Contact Us</h4>
+          <p>Email: support@mentalwellness.com</p>
+          <p>Phone: 1-800-123-4567</p>
+        </div>
+        <div class="footer-section">
+          <h4>Emergency</h4>
+          <p>If you're in crisis, please call our 24/7 helpline</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Mental Wellness. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
