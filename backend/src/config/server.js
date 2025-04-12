@@ -1,10 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const path = require('path');
 
-// Load environment variables with correct path
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+// Load environment variables
+dotenv.config();
 
 const connectDB = require('./db');
 const streakTracker = require('../middleware/streakTracker');

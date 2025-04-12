@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const path = require('path');
 
-// Load env vars with correct path
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+// Load env vars
+dotenv.config();
 
 const connectDB = async () => {
     console.log('MONGO_URI:', process.env.MONGO_URI);
