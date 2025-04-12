@@ -5,16 +5,17 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const connectDB = async () => {
-    console.log('MONGO_URI:', process.env.MONGO_URI);
+    const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+    console.log('MongoDB URI:', mongoUri);
     
-    if (!process.env.MONGO_URI) {
+    if (!mongoUri) {
         console.error('MongoDB URI is not defined in environment variables');
         console.log('Server will continue without database connection');
         return;
     }
     
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI, {
+        const conn = await mongoose.connect(mongoUri, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });

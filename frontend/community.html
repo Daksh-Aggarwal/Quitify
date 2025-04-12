@@ -4,8 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Community | Mental Health Support</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      // Authentication check - redirect to login page if not authenticated
+      window.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = 'index.html?auth=login&redirect=community';
+        }
+      });
+    </script>
   </head>
   <body>
     <nav class="navbar">
@@ -16,8 +26,13 @@
         <a href="community.html" class="active"><span class="nav-icon">👥</span>Community</a>
         <a href="addiction-tracker.html"><span class="nav-icon">📊</span>Recovery Tracker</a>
       </div>
-      <div class="emergency-contact">
-        Emergency Helpline: <a href="tel:+1-800-123-4567">1-800-123-4567</a>
+      <div class="auth-nav">
+        <button id="loginNavBtn" class="btn btn-outline">Login</button>
+        <button id="registerNavBtn" class="btn btn-primary">Register</button>
+      </div>
+      <div class="user-nav" style="display: none;">
+        <span class="username"></span>
+        <button id="logoutBtn" class="btn btn-outline">Logout</button>
       </div>
       <button class="mobile-menu-btn">
         <div class="bar"></div>
@@ -119,6 +134,6 @@
       </div>
     </footer>
 
-    <script type="module" src="/main.js"></script>
+    <script type="module" src="js/main.js"></script>
   </body>
 </html>

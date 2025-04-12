@@ -1,5 +1,14 @@
+import communityService from './services/communityService.js';
+import authService from './services/authService.js';
+
 // Mobile menu functionality
 document.addEventListener('DOMContentLoaded', () => {
+  // Authentication initialization - ensure the authService is properly initialized
+  if (authService.isLoggedIn()) {
+    // Update UI based on authentication status
+    updateAuthUI();
+  }
+
   const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
   const navLinks = document.querySelector('.nav-links');
   
@@ -43,7 +52,209 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Initialize Journey section
   initJourneySection();
+
+  // Handle login/register buttons in the navbar
+  const loginNavBtn = document.getElementById('loginNavBtn');
+  const registerNavBtn = document.getElementById('registerNavBtn');
+  
+  if (loginNavBtn) {
+    loginNavBtn.addEventListener('click', () => {
+      showAuthModal('login');
+    });
+  }
+  
+  if (registerNavBtn) {
+    registerNavBtn.addEventListener('click', () => {
+      showAuthModal('register');
+    });
+  }
+  
+  // Check for URL parameters that might indicate where to redirect after login
+  const urlParams = new URLSearchParams(window.location.search);
+  const authAction = urlParams.get('auth');
+  const redirect = urlParams.get('redirect');
+  
+  if (authAction === 'login') {
+    showAuthModal('login');
+    if (redirect) {
+      // Store redirect target
+      sessionStorage.setItem('redirectAfterLogin', redirect);
+    }
+  } else if (authAction === 'register') {
+    showAuthModal('register');
+    if (redirect) {
+      sessionStorage.setItem('redirectAfterLogin', redirect);
+    }
+  }
+
+  // Get Help button shows login modal
+  const getHelpBtn = document.getElementById('getHelp');
+  if (getHelpBtn) {
+    getHelpBtn.addEventListener('click', () => {
+      showAuthModal('login');
+    });
+  }
+
+  // Import community service
+  
+
+  // Load community data from backend
+  loadCommunityData();
 });
+
+// Show the authentication modal with specified tab (login or register)
+function showAuthModal(tab = 'login') {
+  const authModal = document.getElementById('authModal');
+  const loginSection = document.querySelector('.login-section');
+  const registerSection = document.querySelector('.register-section');
+  
+  if (authModal) {
+    authModal.style.display = 'flex';
+    
+    // Show the appropriate tab
+    if (tab === 'login') {
+      loginSection.classList.remove('hidden');
+      registerSection.classList.add('hidden');
+    } else {
+      registerSection.classList.remove('hidden');
+      loginSection.classList.add('hidden');
+    }
+    
+    // Close when clicking X
+    const closeBtn = document.querySelector('.close-modal');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        authModal.style.display = 'none';
+      });
+    }
+    
+    // Close when clicking outside
+    authModal.addEventListener('click', (e) => {
+      if (e.target === authModal) {
+        authModal.style.display = 'none';
+      }
+    });
+  }
+}
+
+// Load community data from backend API
+async function loadCommunityData() {
+  try {
+    // Load community highlights for the homepage slider
+    const highlightsSection = document.querySelector('.community-highlights');
+    if (highlightsSection) {
+      const result = await communityService.getCommunityHighlights();
+      if (result.success) {
+        updateCommunityHighlights(result.highlights);
+      }
+    }
+    
+    // Load community leaders for the leaderboard section
+    const leaderboardSection = document.querySelector('.leaderboard-section');
+    if (leaderboardSection && !window.location.pathname.includes('addiction-tracker.html')) {
+      const result = await communityService.getCommunityLeaders();
+      if (result.success) {
+        updateCommunityLeaders(result.leaders);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load community data:', error);
+  }
+}
+
+// Update community highlights in the homepage slider
+function updateCommunityHighlights(highlights) {
+  const postsGrid = document.querySelector('.posts-grid');
+  if (!postsGrid || !highlights || !highlights.length) return;
+  
+  // Clear existing posts
+  postsGrid.innerHTML = '';
+  
+  // Add posts from the API
+  highlights.forEach(post => {
+    const postCard = document.createElement('div');
+    postCard.className = 'post-card';
+    
+    // Format the date
+    const postDate = new Date(post.createdAt);
+    const timeAgo = getTimeAgo(postDate);
+    
+    postCard.innerHTML = `
+      <div class="post-header">
+        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author.id}" alt="Avatar" class="avatar">
+        <div class="post-meta">
+          <h3>${post.author.username}</h3>
+          <span>${timeAgo}</span>
+        </div>
+      </div>
+      <p>${post.content}</p>
+      <div class="post-stats">
+        <span>❤️ ${post.likes || 0} likes</span>
+        <span>💭 ${post.comments ? post.comments.length : 0} comments</span>
+      </div>
+    `;
+    
+    postsGrid.appendChild(postCard);
+  });
+  
+  // Reinitialize the slider
+  initCommunityHighlightsSlider();
+}
+
+// Update community leaders in the leaderboard section
+function updateCommunityLeaders(leaders) {
+  const leaderboard = document.querySelector('.leaderboard');
+  if (!leaderboard || !leaders || !leaders.length) return;
+  
+  // Clear existing leaders
+  leaderboard.innerHTML = '';
+  
+  // Add leaders from the API
+  leaders.forEach((leader, index) => {
+    const leaderCard = document.createElement('div');
+    leaderCard.className = 'leader-card';
+    
+    // Determine badge icons based on leader's achievements
+    const badges = leader.badges.map(badge => 
+      `<span class="badge" title="${badge.name}">${badge.icon}</span>`
+    ).join('');
+    
+    leaderCard.innerHTML = `
+      <div class="leader-rank">${index + 1}</div>
+      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${leader.id}" alt="Top contributor" class="avatar">
+      <h3>${leader.username}</h3>
+      <p>${leader.title || 'Community Member'}</p>
+      <span class="streak">${leader.streakIcon || '🔥'} ${leader.streaks} day streak</span>
+      <div class="achievement-badges">
+        ${badges || '<span class="badge" title="Member">👤</span>'}
+      </div>
+    `;
+    
+    leaderboard.appendChild(leaderCard);
+  });
+  
+  // Initialize the leaderboard interaction effects
+  initLeaderboardInteractions();
+}
+
+// Helper function to format date as time ago
+function getTimeAgo(date) {
+  const now = new Date();
+  const secondsAgo = Math.floor((now - date) / 1000);
+  
+  if (secondsAgo < 60) {
+    return 'just now';
+  } else if (secondsAgo < 3600) {
+    const minutes = Math.floor(secondsAgo / 60);
+    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+  } else if (secondsAgo < 86400) {
+    const hours = Math.floor(secondsAgo / 3600);
+    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  } else {
+    const days = Math.floor(secondsAgo / 86400);
+    return `${days} day${days > 1 ? 's' : ''} ago`;
+  }
+}
 
 // Initialize Community Highlights Slider
 function initCommunityHighlightsSlider() {
@@ -776,5 +987,183 @@ function initJourneySection() {
       timelineLine.style.transition = 'height 1.5s ease-out';
       timelineLine.style.height = '100%';
     }, 500);
+  }
+}
+
+// Main JavaScript file for authentication and shared functionality
+import authService from './services/authService.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Check if user is already logged in
+  if (authService.isLoggedIn() && window.location.pathname.includes('index.html')) {
+    // Redirect to addiction tracker page if already logged in
+    window.location.href = 'addiction-tracker.html';
+    return;
+  }
+
+  // Login Form
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const loginBtn = document.getElementById('loginBtn');
+      const errorMessage = document.getElementById('loginError');
+      
+      if (!email || !password) {
+        errorMessage.textContent = 'Please fill in all fields';
+        errorMessage.style.display = 'block';
+        return;
+      }
+      
+      // Show loading state
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Logging in...';
+      errorMessage.style.display = 'none';
+      
+      try {
+        const result = await authService.login(email, password);
+        
+        if (result.success) {
+          // Redirect to the appropriate page
+          const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+          if (redirectAfterLogin) {
+            sessionStorage.removeItem('redirectAfterLogin');
+            window.location.href = `${redirectAfterLogin}.html`;
+          } else {
+            window.location.href = 'addiction-tracker.html';
+          }
+        } else {
+          // Show error
+          errorMessage.textContent = result.error;
+          errorMessage.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        errorMessage.textContent = 'An error occurred during login. Please try again.';
+        errorMessage.style.display = 'block';
+      } finally {
+        // Reset button state
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login';
+      }
+    });
+  }
+  
+  // Registration Form
+  const registerForm = document.getElementById('registerForm');
+  if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('registerUsername').value.trim();
+      const email = document.getElementById('registerEmail').value.trim();
+      const password = document.getElementById('registerPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const registerBtn = document.getElementById('registerBtn');
+      const errorMessage = document.getElementById('registerError');
+      
+      if (!username || !email || !password || !confirmPassword) {
+        errorMessage.textContent = 'Please fill in all fields';
+        errorMessage.style.display = 'block';
+        return;
+      }
+      
+      if (password !== confirmPassword) {
+        errorMessage.textContent = 'Passwords do not match';
+        errorMessage.style.display = 'block';
+        return;
+      }
+      
+      // Show loading state
+      registerBtn.disabled = true;
+      registerBtn.textContent = 'Creating account...';
+      errorMessage.style.display = 'none';
+      
+      try {
+        const result = await authService.register(username, email, password);
+        
+        if (result.success) {
+          // Redirect to the appropriate page
+          const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+          if (redirectAfterLogin) {
+            sessionStorage.removeItem('redirectAfterLogin');
+            window.location.href = `${redirectAfterLogin}.html`;
+          } else {
+            window.location.href = 'addiction-tracker.html';
+          }
+        } else {
+          // Show error
+          errorMessage.textContent = result.error;
+          errorMessage.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Registration error:', error);
+        errorMessage.textContent = 'An error occurred during registration. Please try again.';
+        errorMessage.style.display = 'block';
+      } finally {
+        // Reset button state
+        registerBtn.disabled = false;
+        registerBtn.textContent = 'Create Account';
+      }
+    });
+  }
+  
+  // Toggle between login and register forms
+  const toggleLinks = document.querySelectorAll('.toggle-form');
+  if (toggleLinks.length > 0) {
+    toggleLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        const loginSection = document.querySelector('.login-section');
+        const registerSection = document.querySelector('.register-section');
+        
+        loginSection.classList.toggle('hidden');
+        registerSection.classList.toggle('hidden');
+      });
+    });
+  }
+  
+  // Logout functionality
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      authService.logout();
+      window.location.href = 'index.html';
+    });
+  }
+  
+  // Update UI based on authentication status
+  updateAuthUI();
+});
+
+// Update UI elements based on authentication status
+function updateAuthUI() {
+  const isLoggedIn = authService.isLoggedIn();
+  const user = authService.getUser();
+  
+  // Update nav items
+  const authNav = document.querySelector('.auth-nav');
+  const userNav = document.querySelector('.user-nav');
+  
+  if (authNav && userNav) {
+    if (isLoggedIn) {
+      authNav.style.display = 'none';
+      userNav.style.display = 'flex';
+      
+      // Set username if available
+      const usernameElement = userNav.querySelector('.username');
+      if (usernameElement && user) {
+        usernameElement.textContent = user.username;
+      }
+    } else {
+      authNav.style.display = 'flex';
+      userNav.style.display = 'none';
+    }
   }
 }

@@ -4,8 +4,40 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mental Health Support | Your Journey to Wellness</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      // Check for URL parameters that might indicate where to redirect after login
+      window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const authAction = urlParams.get('auth');
+        const redirect = urlParams.get('redirect');
+        
+        if (authAction === 'login') {
+          // Show the auth modal with login tab when page loads
+          setTimeout(() => {
+            const authModal = document.getElementById('authModal');
+            if (authModal) {
+              authModal.style.display = 'flex';
+              
+              // Show login section, hide register section
+              const loginSection = document.querySelector('.login-section');
+              const registerSection = document.querySelector('.register-section');
+              if (loginSection && registerSection) {
+                loginSection.classList.remove('hidden');
+                registerSection.classList.add('hidden');
+              }
+              
+              // Store redirect target
+              if (redirect) {
+                sessionStorage.setItem('redirectAfterLogin', redirect);
+              }
+            }
+          }, 100);
+        }
+      });
+    </script>
   </head>
   <body>
     <nav class="navbar">
@@ -16,8 +48,13 @@
         <a href="community.html"><span class="nav-icon">👥</span>Community</a>
         <a href="addiction-tracker.html"><span class="nav-icon">📊</span>Recovery Tracker</a>
       </div>
-      <div class="emergency-contact">
-        Emergency Helpline: <a href="tel:+1-800-123-4567">1-800-123-4567</a>
+      <div class="auth-nav">
+        <button id="loginNavBtn" class="btn btn-outline">Login</button>
+        <button id="registerNavBtn" class="btn btn-primary">Register</button>
+      </div>
+      <div class="user-nav" style="display: none;">
+        <span class="username"></span>
+        <button id="logoutBtn" class="btn btn-outline">Logout</button>
       </div>
       <button class="mobile-menu-btn">
         <div class="bar"></div>
@@ -34,6 +71,55 @@
           <button id="getHelp" class="cta-button">Get Help Now</button>
         </div>
       </section>
+
+      <!-- Login/Register Modal -->
+      <div class="auth-modal" id="authModal" style="display: none;">
+        <div class="modal-content">
+          <span class="close-modal">&times;</span>
+          
+          <div class="login-section">
+            <h2>Welcome Back</h2>
+            <form id="loginForm">
+              <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" required>
+              </div>
+              <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" required>
+              </div>
+              <div class="error-message" id="loginError"></div>
+              <button type="submit" id="loginBtn" class="btn btn-primary full-width">Login</button>
+            </form>
+            <p class="auth-switch">Don't have an account? <a href="#" class="toggle-form">Register here</a></p>
+          </div>
+          
+          <div class="register-section hidden">
+            <h2>Create Account</h2>
+            <form id="registerForm">
+              <div class="form-group">
+                <label for="registerUsername">Username</label>
+                <input type="text" id="registerUsername" required>
+              </div>
+              <div class="form-group">
+                <label for="registerEmail">Email</label>
+                <input type="email" id="registerEmail" required>
+              </div>
+              <div class="form-group">
+                <label for="registerPassword">Password</label>
+                <input type="password" id="registerPassword" required>
+              </div>
+              <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" required>
+              </div>
+              <div class="error-message" id="registerError"></div>
+              <button type="submit" id="registerBtn" class="btn btn-primary full-width">Create Account</button>
+            </form>
+            <p class="auth-switch">Already have an account? <a href="#" class="toggle-form">Login here</a></p>
+          </div>
+        </div>
+      </div>
 
       <section class="community-highlights">
         <h2>Community Highlights</h2>
@@ -154,6 +240,6 @@
       </div>
     </footer>
 
-    <script type="module" src="/main.js"></script>
+    <script type="module" src="js/main.js"></script>
   </body>
 </html>

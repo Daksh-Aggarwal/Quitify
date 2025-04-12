@@ -1,4 +1,7 @@
 // Addiction Tracker JavaScript functionality
+import addictionService from './services/addictionService.js';
+import authService from './services/authService.js';
+
 document.addEventListener('DOMContentLoaded', () => {
   // DOM Elements
   const addictionForm = document.getElementById('addictionForm');
@@ -8,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const startDateInput = document.getElementById('startDate');
   const motivationSlider = document.getElementById('motivationLevel');
   const motivationValue = document.getElementById('motivationValue');
-  const recoveryGoalInput = document.getElementById('recoveryGoal');
+  const recoveryGoalInput = document.getElementById('recoveryGoalInput');
   const saveGoalBtn = document.getElementById('saveGoalBtn');
   const progressSection = document.getElementById('progressSection');
   const addictionDisplay = document.getElementById('addictionDisplay').querySelector('span');
@@ -29,6 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const today = new Date();
   const formattedDate = today.toISOString().substr(0, 10);
   startDateInput.value = formattedDate;
+
+  // Check if user is logged in
+  if (!authService.isLoggedIn()) {
+    // Redirect to login page
+    window.location.href = 'index.html';
+    return;
+  }
 
   // Initialize the tracker based on stored data
   initializeTracker();
@@ -64,29 +74,34 @@ document.addEventListener('DOMContentLoaded', () => {
   viewMoreBtn.addEventListener('click', loadMoreLeaders);
 
   // Functions
-  function initializeTracker() {
-    const savedGoal = localStorage.getItem('addictionGoal');
-    
-    if (savedGoal) {
-      const goalData = JSON.parse(savedGoal);
+  async function initializeTracker() {
+    try {
+      // Get user's goal from API
+      const goalResult = await addictionService.getGoal();
       
-      // Display progress section instead of goal form
-      document.querySelector('.set-goal-section').style.display = 'none';
-      progressSection.style.display = 'block';
-      
-      // Update the display with saved data
-      addictionDisplay.textContent = goalData.addictionType === 'Other' ? goalData.otherAddiction : goalData.addictionType;
-      startDateDisplay.textContent = formatDate(goalData.startDate);
-      
-      // Calculate and display days clean
-      const daysSince = calculateDaysSince(goalData.startDate);
-      dayCount.textContent = daysSince;
-      
-      // Update milestone cards
-      updateMilestones(daysSince);
-      
-      // Load check-ins
-      loadCheckIns();
+      if (goalResult.success && goalResult.goal) {
+        // Display progress section instead of goal form
+        document.querySelector('.set-goal-section').style.display = 'none';
+        progressSection.style.display = 'block';
+        
+        const goalData = goalResult.goal;
+        
+        // Update the display with saved data
+        addictionDisplay.textContent = goalData.addictionType === 'Other' ? goalData.otherAddiction : goalData.addictionType;
+        startDateDisplay.textContent = formatDate(goalData.startDate);
+        
+        // Calculate and display days clean
+        const daysSince = calculateDaysSince(goalData.startDate);
+        dayCount.textContent = daysSince;
+        
+        // Update milestone cards
+        updateMilestones(daysSince);
+        
+        // Load check-ins
+        loadCheckIns();
+      }
+    } catch (error) {
+      console.error('Error initializing tracker:', error);
     }
   }
 
@@ -104,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     motivationValue.textContent = motivationSlider.value;
   }
 
-  function handleFormSubmit(e) {
+  async function handleFormSubmit(e) {
     e.preventDefault();
     
     // Form validation
@@ -132,46 +147,77 @@ document.addEventListener('DOMContentLoaded', () => {
       recoveryGoal: recoveryGoalInput.value.trim()
     };
     
-    localStorage.setItem('addictionGoal', JSON.stringify(goalData));
+    // Show loading state
+    saveGoalBtn.disabled = true;
+    saveGoalBtn.textContent = 'Saving...';
     
-    // Show progress section
-    document.querySelector('.set-goal-section').style.display = 'none';
-    progressSection.style.display = 'block';
-    
-    // Update the display
-    addictionDisplay.textContent = goalData.addictionType === 'Other' ? goalData.otherAddiction : goalData.addictionType;
-    startDateDisplay.textContent = formatDate(goalData.startDate);
-    
-    // Calculate and display days clean
-    const daysSince = calculateDaysSince(goalData.startDate);
-    dayCount.textContent = daysSince;
-    
-    // Update milestone cards
-    updateMilestones(daysSince);
+    try {
+      // Save goal to API
+      const result = await addictionService.saveGoal(goalData);
+      
+      if (result.success) {
+        // Show progress section
+        document.querySelector('.set-goal-section').style.display = 'none';
+        progressSection.style.display = 'block';
+        
+        // Update the display
+        addictionDisplay.textContent = goalData.addictionType === 'Other' ? goalData.otherAddiction : goalData.addictionType;
+        startDateDisplay.textContent = formatDate(goalData.startDate);
+        
+        // Calculate and display days clean
+        const daysSince = calculateDaysSince(goalData.startDate);
+        dayCount.textContent = daysSince;
+        
+        // Update milestone cards
+        updateMilestones(daysSince);
+        
+        showNotification('Recovery goal saved successfully!');
+      } else {
+        showNotification('Error: ' + result.error, 'error');
+      }
+    } catch (error) {
+      console.error('Save goal error:', error);
+      showNotification('Failed to save goal. Please try again later.', 'error');
+    } finally {
+      // Reset button state
+      saveGoalBtn.disabled = false;
+      saveGoalBtn.textContent = 'Save Goal';
+    }
   }
 
-  function showEditForm() {
-    const savedGoal = JSON.parse(localStorage.getItem('addictionGoal'));
-    
-    // Populate the form with saved data
-    addictionTypeSelect.value = savedGoal.addictionType;
-    handleAddictionTypeChange();
-    
-    if (savedGoal.addictionType === 'Other') {
-      otherAddiction.value = savedGoal.otherAddiction;
+  async function showEditForm() {
+    try {
+      const result = await addictionService.getGoal();
+      
+      if (result.success) {
+        const savedGoal = result.goal;
+        
+        // Populate the form with saved data
+        addictionTypeSelect.value = savedGoal.addictionType;
+        handleAddictionTypeChange();
+        
+        if (savedGoal.addictionType === 'Other') {
+          otherAddiction.value = savedGoal.otherAddiction;
+        }
+        
+        startDateInput.value = new Date(savedGoal.startDate).toISOString().substr(0, 10);
+        motivationSlider.value = savedGoal.motivationLevel;
+        updateMotivationValue();
+        recoveryGoalInput.value = savedGoal.recoveryGoal || '';
+        
+        // Show the goal form
+        document.querySelector('.set-goal-section').style.display = 'block';
+        progressSection.style.display = 'none';
+        
+        // Scroll to the form
+        document.querySelector('.set-goal-section').scrollIntoView({ behavior: 'smooth' });
+      } else {
+        showNotification('Error: Could not retrieve your goal data.', 'error');
+      }
+    } catch (error) {
+      console.error('Edit goal error:', error);
+      showNotification('Failed to edit goal. Please try again later.', 'error');
     }
-    
-    startDateInput.value = savedGoal.startDate;
-    motivationSlider.value = savedGoal.motivationLevel;
-    updateMotivationValue();
-    recoveryGoalInput.value = savedGoal.recoveryGoal;
-    
-    // Show the goal form
-    document.querySelector('.set-goal-section').style.display = 'block';
-    progressSection.style.display = 'none';
-    
-    // Scroll to the form
-    document.querySelector('.set-goal-section').scrollIntoView({ behavior: 'smooth' });
   }
 
   function calculateDaysSince(startDate) {
@@ -198,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function saveCheckIn() {
+  async function saveCheckIn() {
     const mood = selectedMoodInput.value;
     const notes = checkInNotes.value.trim();
     
@@ -207,62 +253,90 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     
-    const checkIn = {
+    const checkInData = {
       date: new Date().toISOString(),
       mood: mood,
       notes: notes
     };
     
-    let checkIns = JSON.parse(localStorage.getItem('addictionCheckIns') || '[]');
-    checkIns.unshift(checkIn); // Add to the beginning of the array
-    localStorage.setItem('addictionCheckIns', JSON.stringify(checkIns));
+    // Disable button during save
+    saveCheckInBtn.disabled = true;
+    saveCheckInBtn.textContent = 'Saving...';
     
-    // Reset form
-    moodButtons.forEach(btn => btn.classList.remove('selected'));
-    selectedMoodInput.value = '';
-    checkInNotes.value = '';
-    
-    // Show success message
-    showNotification('Check-in saved successfully!');
-    
-    // Reload check-ins
-    loadCheckIns();
-  }
-
-  function loadCheckIns() {
-    const checkIns = JSON.parse(localStorage.getItem('addictionCheckIns') || '[]');
-    
-    if (checkIns.length === 0) {
-      checkInList.innerHTML = `
-        <div class="empty-state">
-          <p>No check-ins recorded yet. Start tracking your journey today!</p>
-        </div>
-      `;
-      return;
+    try {
+      // Save check-in to API
+      const result = await addictionService.saveCheckIn(checkInData);
+      
+      if (result.success) {
+        // Reset form
+        moodButtons.forEach(btn => btn.classList.remove('selected'));
+        selectedMoodInput.value = '';
+        checkInNotes.value = '';
+        
+        // Show success message
+        showNotification('Check-in saved successfully!');
+        
+        // Reload check-ins
+        loadCheckIns();
+      } else {
+        showNotification('Error: ' + result.error, 'error');
+      }
+    } catch (error) {
+      console.error('Save check-in error:', error);
+      showNotification('Failed to save check-in. Please try again later.', 'error');
+    } finally {
+      // Reset button state
+      saveCheckInBtn.disabled = false;
+      saveCheckInBtn.textContent = 'Save Check-In';
     }
-    
-    checkInList.innerHTML = '';
-    
-    // Show the 5 most recent check-ins
-    const recentCheckIns = checkIns.slice(0, 5);
-    
-    recentCheckIns.forEach(checkIn => {
-      const checkInItem = document.createElement('div');
-      checkInItem.className = 'check-in-item';
-      
-      checkInItem.innerHTML = `
-        <div class="check-in-header">
-          <div class="check-in-date">${formatDate(checkIn.date)}</div>
-          <div class="check-in-mood">${checkIn.mood}</div>
-        </div>
-        <div class="check-in-content">${checkIn.notes || 'No notes for this day.'}</div>
-      `;
-      
-      checkInList.appendChild(checkInItem);
-    });
   }
 
-  function filterLeaderboard(filter) {
+  async function loadCheckIns() {
+    try {
+      const result = await addictionService.getCheckIns();
+      let checkIns = [];
+      
+      if (result.success) {
+        checkIns = result.checkIns;
+      }
+      
+      if (checkIns.length === 0) {
+        checkInList.innerHTML = `
+          <div class="empty-state">
+            <p>No check-ins recorded yet. Start tracking your journey today!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      checkInList.innerHTML = '';
+      
+      // Show the 5 most recent check-ins
+      const recentCheckIns = checkIns.slice(0, 5);
+      
+      recentCheckIns.forEach(checkIn => {
+        const checkInItem = document.createElement('div');
+        checkInItem.className = 'check-in-item';
+        
+        checkInItem.innerHTML = `
+          <div class="check-in-header">
+            <div class="check-in-date">${formatDate(checkIn.date)}</div>
+            <div class="check-in-mood">${checkIn.mood}</div>
+          </div>
+          <div class="check-in-content">${checkIn.notes || 'No notes for this day.'}</div>
+        `;
+        
+        checkInList.appendChild(checkInItem);
+      });
+    } catch (error) {
+      console.error('Load check-ins error:', error);
+      showNotification('Failed to load check-ins.', 'error');
+    }
+  }
+
+  async function filterLeaderboard(filter) {
+    // In a future version, this would call the communityService.filterLeaderboard method
+    // For now, we'll keep the client-side filtering
     leaderboardEntries.forEach(entry => {
       const addiction = entry.querySelector('.addiction').textContent;
       
@@ -275,7 +349,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function loadMoreLeaders() {
-    // Mock function to simulate loading more data
+    // This would fetch more leaders from the API in a future version
+    // For now, we'll keep the mock implementation
     viewMoreBtn.textContent = 'Loading...';
     
     setTimeout(() => {
@@ -339,13 +414,12 @@ document.addEventListener('DOMContentLoaded', () => {
       viewMoreBtn.addEventListener('click', () => {
         alert('End of leaderboard reached. Check back later for more recovery champions!');
       });
-      
     }, 1000);
   }
 
-  function showNotification(message) {
+  function showNotification(message, type = 'success') {
     const notification = document.createElement('div');
-    notification.className = 'notification';
+    notification.className = `notification ${type}`;
     notification.textContent = message;
     
     // Style the notification
@@ -353,7 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
       position: 'fixed',
       bottom: '20px',
       right: '20px',
-      backgroundColor: 'var(--primary-color)',
+      backgroundColor: type === 'success' ? 'var(--primary-color)' : 'var(--error-color, #e74c3c)',
       color: 'white',
       padding: '1rem 2rem',
       borderRadius: '10px',

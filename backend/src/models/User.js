@@ -1,12 +1,37 @@
 const mongoose = require('mongoose');
 
+const CheckInSchema = new mongoose.Schema({
+    date: {
+        type: Date,
+        default: Date.now
+    },
+    mood: String,
+    notes: String
+});
+
+const GoalSchema = new mongoose.Schema({
+    addictionType: String,
+    otherAddiction: String,
+    startDate: Date,
+    motivationLevel: Number,
+    recoveryGoal: String
+});
+
 const UserSchema = new mongoose.Schema({
     username: String,
     email: String,
     passwordHash: String,
-    streaks: Number,
+    streaks: {
+        type: Number,
+        default: 0
+    },
     badges: [String],
-    isAnonymous: Boolean,
+    isAnonymous: {
+        type: Boolean,
+        default: false
+    },
+    goal: GoalSchema,
+    checkIns: [CheckInSchema],
     lastActivity: {
         type: Date,
         default: Date.now
