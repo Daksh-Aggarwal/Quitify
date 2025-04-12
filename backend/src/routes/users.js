@@ -6,12 +6,6 @@ const auth = require('../middleware/auth');
 // GET /api/users - Get all users
 router.get('/', userController.getAllUsers);
 
-// GET /api/users/:id
-router.get('/:id', userController.getUserProfile);
-
-// PUT /api/users/:id
-router.put('/:id', auth, userController.updateUserProfile);
-
 // Goals and check-ins routes - all require authentication
 // GET /api/users/goals - Get current user's goals
 router.get('/goals', auth, userController.getUserGoal);
@@ -27,5 +21,11 @@ router.get('/checkins', auth, userController.getUserCheckIns);
 
 // POST /api/users/checkins - Create a new check-in
 router.post('/checkins', auth, userController.createUserCheckIn);
+
+// GET /api/users/:id - Must come after specific routes
+router.get('/:id', userController.getUserProfile);
+
+// PUT /api/users/:id
+router.put('/:id', auth, userController.updateUserProfile);
 
 module.exports = router;

@@ -53,6 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Journey section
   initJourneySection();
 
+  // Handle Welcome Modal
+  initWelcomeModal();
+
   // Handle login/register buttons in the navbar
   const loginNavBtn = document.getElementById('loginNavBtn');
   const registerNavBtn = document.getElementById('registerNavBtn');
@@ -95,20 +98,85 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Import community service
+  // Initialize password toggle functionality
+  initPasswordToggles();
   
-
   // Load community data from backend
   loadCommunityData();
 });
+
+// Initialize the Welcome Modal for first-time visitors
+function initWelcomeModal() {
+  const welcomeModal = document.getElementById('welcomeModal');
+  if (!welcomeModal) return;
+  
+  // Handle welcome modal close button
+  const closeBtn = welcomeModal.querySelector('.close-modal');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      welcomeModal.style.display = 'none';
+    });
+  }
+  
+  // Handle Register button click
+  const registerBtn = document.getElementById('welcomeRegisterBtn');
+  if (registerBtn) {
+    registerBtn.addEventListener('click', () => {
+      welcomeModal.style.display = 'none';
+      showAuthModal('register');
+    });
+  }
+  
+  // Handle Login button click
+  const loginBtn = document.getElementById('welcomeLoginBtn');
+  if (loginBtn) {
+    loginBtn.addEventListener('click', () => {
+      welcomeModal.style.display = 'none';
+      showAuthModal('login');
+    });
+  }
+  
+  // Close welcome modal when clicking outside
+  welcomeModal.addEventListener('click', (e) => {
+    if (e.target === welcomeModal) {
+      welcomeModal.style.display = 'none';
+    }
+  });
+}
+
+// Initialize password toggle functionality
+function initPasswordToggles() {
+  const passwordToggles = document.querySelectorAll('.password-toggle');
+  
+  passwordToggles.forEach(toggle => {
+    toggle.addEventListener('click', function() {
+      const passwordInput = this.previousElementSibling;
+      
+      // Toggle password visibility
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        this.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        this.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    });
+  });
+}
 
 // Show the authentication modal with specified tab (login or register)
 function showAuthModal(tab = 'login') {
   const authModal = document.getElementById('authModal');
   const loginSection = document.querySelector('.login-section');
   const registerSection = document.querySelector('.register-section');
+  const modalContent = document.querySelector('.modal-content');
   
   if (authModal) {
+    // Reset animation
+    modalContent.classList.remove('fade-in');
+    void modalContent.offsetWidth; // Trigger reflow
+    modalContent.classList.add('fade-in');
+    
     authModal.style.display = 'flex';
     
     // Show the appropriate tab
@@ -120,21 +188,45 @@ function showAuthModal(tab = 'login') {
       loginSection.classList.add('hidden');
     }
     
-    // Close when clicking X
+    // Remove existing event listeners to prevent duplicates
     const closeBtn = document.querySelector('.close-modal');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
-        authModal.style.display = 'none';
-      });
-    }
+    const newCloseBtn = closeBtn.cloneNode(true);
+    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
     
-    // Close when clicking outside
-    authModal.addEventListener('click', (e) => {
+    // Add close event listener
+    newCloseBtn.addEventListener('click', () => {
+      authModal.style.display = 'none';
+    });
+    
+    // Close when clicking outside - use one-time event listener to prevent duplicates
+    const closeModalOutside = (e) => {
       if (e.target === authModal) {
         authModal.style.display = 'none';
+        authModal.removeEventListener('click', closeModalOutside);
       }
-    });
+    };
+    
+    // Remove any existing click listeners (by cloning and replacing)
+    const newAuthModal = authModal.cloneNode(true);
+    newAuthModal.querySelector('.modal-content').replaceWith(modalContent);
+    authModal.parentNode.replaceChild(newAuthModal, authModal);
+    
+    // Add the click listener to the new modal
+    newAuthModal.addEventListener('click', closeModalOutside);
+    
+    // Add escape key handler
+    const handleEscKey = (e) => {
+      if (e.key === 'Escape') {
+        newAuthModal.style.display = 'none';
+        document.removeEventListener('keydown', handleEscKey);
+      }
+    };
+    document.addEventListener('keydown', handleEscKey);
+    
+    return newAuthModal;
   }
+  
+  return authModal;
 }
 
 // Load community data from backend API
@@ -146,6 +238,9 @@ async function loadCommunityData() {
       const result = await communityService.getCommunityHighlights();
       if (result.success) {
         updateCommunityHighlights(result.highlights);
+      } else {
+        console.log('Using default community highlights');
+        // Keep the default highlights that are in the HTML
       }
     }
     
@@ -155,6 +250,9 @@ async function loadCommunityData() {
       const result = await communityService.getCommunityLeaders();
       if (result.success) {
         updateCommunityLeaders(result.leaders);
+      } else {
+        console.log('Using default community leaders');
+        // Keep the default leaders that are in the HTML
       }
     }
   } catch (error) {
@@ -181,9 +279,9 @@ function updateCommunityHighlights(highlights) {
     
     postCard.innerHTML = `
       <div class="post-header">
-        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author.id}" alt="Avatar" class="avatar">
+        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author?.id || Math.floor(Math.random() * 1000)}" alt="Avatar" class="avatar">
         <div class="post-meta">
-          <h3>${post.author.username}</h3>
+          <h3>${post.author?.username || 'Anonymous User'}</h3>
           <span>${timeAgo}</span>
         </div>
       </div>
@@ -215,18 +313,20 @@ function updateCommunityLeaders(leaders) {
     leaderCard.className = 'leader-card';
     
     // Determine badge icons based on leader's achievements
-    const badges = leader.badges.map(badge => 
-      `<span class="badge" title="${badge.name}">${badge.icon}</span>`
-    ).join('');
+    const badges = leader.badges && leader.badges.length > 0 
+      ? leader.badges.map(badge => 
+          `<span class="badge" title="${badge.name || badge}">${badge.icon || '🏆'}</span>`
+        ).join('')
+      : '<span class="badge" title="Member">👤</span>';
     
     leaderCard.innerHTML = `
       <div class="leader-rank">${index + 1}</div>
-      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${leader.id}" alt="Top contributor" class="avatar">
+      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${leader.id || index + 10}" alt="Top contributor" class="avatar">
       <h3>${leader.username}</h3>
       <p>${leader.title || 'Community Member'}</p>
-      <span class="streak">${leader.streakIcon || '🔥'} ${leader.streaks} day streak</span>
+      <span class="streak">${leader.streakIcon || '🔥'} ${leader.streaks || '0'} day streak</span>
       <div class="achievement-badges">
-        ${badges || '<span class="badge" title="Member">👤</span>'}
+        ${badges}
       </div>
     `;
     
@@ -239,21 +339,29 @@ function updateCommunityLeaders(leaders) {
 
 // Helper function to format date as time ago
 function getTimeAgo(date) {
-  const now = new Date();
-  const secondsAgo = Math.floor((now - date) / 1000);
-  
-  if (secondsAgo < 60) {
-    return 'just now';
-  } else if (secondsAgo < 3600) {
-    const minutes = Math.floor(secondsAgo / 60);
-    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-  } else if (secondsAgo < 86400) {
-    const hours = Math.floor(secondsAgo / 3600);
-    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-  } else {
-    const days = Math.floor(secondsAgo / 86400);
-    return `${days} day${days > 1 ? 's' : ''} ago`;
+  const seconds = Math.floor((new Date() - date) / 1000);
+  let interval = seconds / 31536000;
+
+  if (interval > 1) {
+    return Math.floor(interval) + " years ago";
   }
+  interval = seconds / 2592000;
+  if (interval > 1) {
+    return Math.floor(interval) + " months ago";
+  }
+  interval = seconds / 86400;
+  if (interval > 1) {
+    return Math.floor(interval) + " days ago";
+  }
+  interval = seconds / 3600;
+  if (interval > 1) {
+    return Math.floor(interval) + " hours ago";
+  }
+  interval = seconds / 60;
+  if (interval > 1) {
+    return Math.floor(interval) + " minutes ago";
+  }
+  return Math.floor(seconds) + " seconds ago";
 }
 
 // Initialize Community Highlights Slider
@@ -991,14 +1099,12 @@ function initJourneySection() {
 }
 
 // Main JavaScript file for authentication and shared functionality
-import authService from './services/authService.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Check if user is already logged in
   if (authService.isLoggedIn() && window.location.pathname.includes('index.html')) {
-    // Redirect to addiction tracker page if already logged in
-    window.location.href = 'addiction-tracker.html';
-    return;
+    // Update UI to show logged-in state but don't redirect from homepage
+    updateAuthUI();
   }
 
   // Login Form
@@ -1027,24 +1133,35 @@ document.addEventListener('DOMContentLoaded', () => {
         const result = await authService.login(email, password);
         
         if (result.success) {
-          // Redirect to the appropriate page
-          const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
-          if (redirectAfterLogin) {
-            sessionStorage.removeItem('redirectAfterLogin');
-            window.location.href = `${redirectAfterLogin}.html`;
-          } else {
-            window.location.href = 'addiction-tracker.html';
-          }
+          // Show success indicator
+          loginBtn.textContent = 'Success ✓';
+          loginBtn.style.background = 'linear-gradient(90deg, #4CAF50, #8BC34A)';
+          
+          // Delay redirect for visual feedback
+          setTimeout(() => {
+            // Redirect to the appropriate page
+            const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+            if (redirectAfterLogin) {
+              sessionStorage.removeItem('redirectAfterLogin');
+              window.location.href = `${redirectAfterLogin}.html`;
+            } else {
+              // Close the modal and update UI
+              document.getElementById('authModal').style.display = 'none';
+              updateAuthUI();
+            }
+          }, 800);
         } else {
           // Show error
           errorMessage.textContent = result.error;
           errorMessage.style.display = 'block';
+          // Reset button state
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Login';
         }
       } catch (error) {
         console.error('Login error:', error);
         errorMessage.textContent = 'An error occurred during login. Please try again.';
         errorMessage.style.display = 'block';
-      } finally {
         // Reset button state
         loginBtn.disabled = false;
         loginBtn.textContent = 'Login';
@@ -1077,6 +1194,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       
+      if (password.length < 6) {
+        errorMessage.textContent = 'Password must be at least 6 characters long';
+        errorMessage.style.display = 'block';
+        return;
+      }
+      
       // Show loading state
       registerBtn.disabled = true;
       registerBtn.textContent = 'Creating account...';
@@ -1086,24 +1209,35 @@ document.addEventListener('DOMContentLoaded', () => {
         const result = await authService.register(username, email, password);
         
         if (result.success) {
-          // Redirect to the appropriate page
-          const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
-          if (redirectAfterLogin) {
-            sessionStorage.removeItem('redirectAfterLogin');
-            window.location.href = `${redirectAfterLogin}.html`;
-          } else {
-            window.location.href = 'addiction-tracker.html';
-          }
+          // Show success indicator
+          registerBtn.textContent = 'Account Created ✓';
+          registerBtn.style.background = 'linear-gradient(90deg, #4CAF50, #8BC34A)';
+          
+          // Delay redirect for visual feedback
+          setTimeout(() => {
+            // Redirect to the appropriate page
+            const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+            if (redirectAfterLogin) {
+              sessionStorage.removeItem('redirectAfterLogin');
+              window.location.href = `${redirectAfterLogin}.html`;
+            } else {
+              // Close the modal and update UI
+              document.getElementById('authModal').style.display = 'none';
+              updateAuthUI();
+            }
+          }, 800);
         } else {
           // Show error
           errorMessage.textContent = result.error;
           errorMessage.style.display = 'block';
+          // Reset button state
+          registerBtn.disabled = false;
+          registerBtn.textContent = 'Create Account';
         }
       } catch (error) {
         console.error('Registration error:', error);
         errorMessage.textContent = 'An error occurred during registration. Please try again.';
         errorMessage.style.display = 'block';
-      } finally {
         // Reset button state
         registerBtn.disabled = false;
         registerBtn.textContent = 'Create Account';
@@ -1120,9 +1254,25 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const loginSection = document.querySelector('.login-section');
         const registerSection = document.querySelector('.register-section');
+        const modalContent = document.querySelector('.modal-content');
+        
+        // Reset animation
+        modalContent.classList.remove('fade-in');
+        void modalContent.offsetWidth; // Trigger reflow
+        modalContent.classList.add('fade-in');
         
         loginSection.classList.toggle('hidden');
         registerSection.classList.toggle('hidden');
+      });
+    });
+  }
+  
+  // Social login buttons (for demo purposes)
+  const socialButtons = document.querySelectorAll('.social-btn');
+  if (socialButtons.length > 0) {
+    socialButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        alert('Social login integration will be available in a future update.');
       });
     });
   }

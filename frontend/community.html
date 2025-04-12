@@ -13,6 +13,7 @@
         const token = localStorage.getItem('token');
         if (!token) {
           window.location.href = 'index.html?auth=login&redirect=community';
+          throw new Error('Auth required'); // Prevent further script execution
         }
       });
     </script>

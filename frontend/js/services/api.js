@@ -30,10 +30,26 @@ async function apiRequest(endpoint, options = {}) {
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
-      headers
+      headers,
+      mode: 'cors',
+      credentials: 'include'
     });
     
-    const data = await response.json();
+    // Handle non-JSON responses
+    const contentType = response.headers.get('content-type');
+    let data;
+    
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      data = await response.text();
+      try {
+        // Try to parse as JSON in case content-type header is incorrect
+        data = JSON.parse(data);
+      } catch (e) {
+        // If it's not JSON, keep it as text
+      }
+    }
     
     if (!response.ok) {
       // Token expired or invalid
@@ -42,7 +58,7 @@ async function apiRequest(endpoint, options = {}) {
         localStorage.removeItem('user');
         // Redirect to login if on protected page
         if (!window.location.pathname.includes('index.html')) {
-          window.location.href = 'index.html';
+          window.location.href = 'index.html?auth=login';
         }
       }
       
