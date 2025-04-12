@@ -1,19 +1,30 @@
 const express = require('express');
+const cors = require('cors');
+const connectDB = require('./db');
+const auth = require('../middleware/auth')
+const streakTracker = require('../middleware/streakTracker');
+const dotenv = require('dotenv');
 
+// Initialize Express app
 const app = express();
-const connectDB = require('./config/db');
 
+// Connect to MongoDB
 connectDB();
 
-// Define a port
-const PORT = 3000;
+// Middleware
+app.use(express.json({ extended: false }));
+app.use(cors());
+app.use(auth);
+app.use(streakTracker);
 
-// Define a simple route
-app.get('/', (req, res) => {
-    res.send('Hello, World!');
-});
+// Define routes
+app.use('/api/auth', require('../routes/auth'));
+app.use('/api/users', require('../routes/users'));
+app.use('/api/posts', require('../routes/posts'));
+app.use('/api/leaderboard', require('../routes/leaderboard'));
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Define port
+const PORT = process.env.PORT || 5000;
+
+// Start server
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

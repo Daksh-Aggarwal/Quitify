@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const PostSchema = new mongoose.Schema({
     authorId: mongoose.Schema.Types.ObjectId,
     content: String,
