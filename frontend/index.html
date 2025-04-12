@@ -83,12 +83,13 @@
       .modal-content {
         border-radius: 16px;
         box-shadow: 0 10px 40px rgba(124, 93, 250, 0.25);
-        padding: 2.5rem;
-        max-width: 450px;
-        width: 90%;
+        padding: 1.75rem;
+        max-width: 360px;
+        width: 85%;
         position: relative;
         overflow: hidden;
         background-color: white;
+        margin: 0 auto;
       }
 
       .modal-content::before {
@@ -103,9 +104,9 @@
 
       .close-modal {
         position: absolute;
-        top: 15px;
-        right: 20px;
-        font-size: 1.8rem;
+        top: 10px;
+        right: 15px;
+        font-size: 1.6rem;
         cursor: pointer;
         color: #888;
         transition: color 0.3s;
@@ -127,26 +128,28 @@
 
       .login-section h2, .register-section h2, .welcome-modal h2 {
         color: var(--primary-color);
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
+        font-size: 1.6rem;
+        margin-bottom: 0.3rem;
+        text-align: center;
       }
 
       .auth-subtitle {
         color: #666;
-        margin-bottom: 2rem;
-        font-size: 0.95rem;
+        margin-bottom: 1.2rem;
+        font-size: 0.9rem;
+        text-align: center;
       }
 
       .form-group {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
         position: relative;
       }
 
       .form-group label {
         display: block;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         font-weight: 500;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         color: #555;
       }
 
@@ -155,12 +158,12 @@
       }
 
       .input-with-icon input {
-        padding-left: 40px;
-        height: 50px;
-        border-radius: 10px;
+        padding-left: 35px;
+        height: 40px;
+        border-radius: 8px;
         border: 1px solid #ddd;
         width: 100%;
-        font-size: 1rem;
+        font-size: 0.9rem;
         transition: all 0.3s;
       }
 
@@ -171,35 +174,37 @@
 
       .input-icon {
         position: absolute;
-        left: 12px;
+        left: 10px;
         top: 50%;
         transform: translateY(-50%);
         color: #aaa;
+        font-size: 0.9rem;
       }
 
       .password-toggle {
         position: absolute;
-        right: 12px;
+        right: 10px;
         top: 50%;
         transform: translateY(-50%);
         color: #aaa;
         cursor: pointer;
+        font-size: 0.9rem;
       }
 
       .error-message {
         color: #e74c3c;
-        font-size: 0.85rem;
-        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        margin-top: 0.4rem;
         font-weight: 500;
         display: none;
       }
 
       .btn.btn-primary.full-width {
-        height: 50px;
-        border-radius: 10px;
+        height: 40px;
+        border-radius: 8px;
         font-weight: 600;
-        font-size: 1rem;
-        margin-top: 1rem;
+        font-size: 0.95rem;
+        margin-top: 0.8rem;
         background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
         transition: all 0.3s;
       }
@@ -211,8 +216,8 @@
 
       .auth-switch {
         text-align: center;
-        margin-top: 1.5rem;
-        font-size: 0.9rem;
+        margin-top: 1rem;
+        font-size: 0.85rem;
         color: #666;
       }
 
@@ -230,20 +235,20 @@
       .social-login {
         display: flex;
         justify-content: center;
-        margin: 1.5rem 0;
-        gap: 1rem;
+        margin: 1rem 0;
+        gap: 0.75rem;
       }
 
       .social-btn {
-        width: 50px;
-        height: 50px;
-        border-radius: 10px;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
         border: 1px solid #ddd;
         background: white;
-        font-size: 1.2rem;
+        font-size: 1rem;
         cursor: pointer;
         transition: all 0.3s;
       }
@@ -269,7 +274,7 @@
         display: flex;
         align-items: center;
         text-align: center;
-        margin: 1.5rem 0;
+        margin: 1rem 0;
         color: #aaa;
       }
 
@@ -282,7 +287,7 @@
 
       .separator span {
         padding: 0 10px;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         font-weight: 500;
       }
       

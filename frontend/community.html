@@ -44,13 +44,57 @@
 
     <main>
       <section class="community-header">
-        <h1>Community Discussions</h1>
+        <h1>Community Support</h1>
+        <div class="community-tabs">
+          <button class="tab-btn active" data-tab="all-posts">All Posts</button>
+          <button class="tab-btn" data-tab="support-groups">Habit-Specific Groups</button>
+          <button class="tab-btn" data-tab="success-stories">Success Stories</button>
+        </div>
         <button class="create-post-btn">Create New Post</button>
       </section>
 
       <section class="post-creation" id="postCreation">
         <div class="post-form">
+          <div class="post-form-header">
+            <h3>Share with the community</h3>
+            <div class="post-type-selector">
+              <label>
+                <input type="radio" name="postType" value="general" checked>
+                General Discussion
+              </label>
+              <label>
+                <input type="radio" name="postType" value="experience">
+                Share Experience
+              </label>
+              <label>
+                <input type="radio" name="postType" value="success_story">
+                Success Story
+              </label>
+              <label>
+                <input type="radio" name="postType" value="question">
+                Ask for Support
+              </label>
+            </div>
+          </div>
+          <input type="text" placeholder="Title (optional)" class="post-title-input">
           <textarea placeholder="Share your thoughts..." class="post-input"></textarea>
+          <div class="habit-category-selector">
+            <label>Relate to a specific habit (optional):
+              <select class="habit-select">
+                <option value="">Select habit category</option>
+                <option value="smoking">Smoking</option>
+                <option value="alcohol">Alcohol</option>
+                <option value="gambling">Gambling</option>
+                <option value="gaming">Gaming</option>
+                <option value="social_media">Social Media</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+            <label class="milestone-container" style="display: none;">
+              <span>Milestone achieved:</span>
+              <input type="text" placeholder="e.g., 30 days sober" class="milestone-input">
+            </label>
+          </div>
           <div class="post-actions">
             <button class="post-btn">Post</button>
             <button class="cancel-btn">Cancel</button>
@@ -58,64 +102,109 @@
         </div>
       </section>
 
-      <section class="discussion-threads">
-        <div class="thread-filters">
-          <button class="filter-btn active">Recent</button>
-          <button class="filter-btn">Popular</button>
-          <button class="filter-btn">Support Needed</button>
-        </div>
-
-        <div class="threads-container">
-          <div class="thread">
-            <div class="thread-header">
-              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=6" alt="Avatar" class="avatar">
-              <div class="thread-meta">
-                <h3>Rachel S.</h3>
-                <span>1 hour ago</span>
-              </div>
-            </div>
-            <div class="thread-content">
-              <p>How do you deal with workplace anxiety? I've been struggling lately and could use some advice.</p>
-            </div>
-            <div class="thread-actions">
-              <button class="action-btn">❤️ Support (23)</button>
-              <button class="action-btn">💭 Comment (8)</button>
-              <button class="action-btn">🔗 Share</button>
-            </div>
-            <div class="comments-section">
-              <div class="comment">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=7" alt="Avatar" class="avatar-small">
-                <div class="comment-content">
-                  <h4>Mark P.</h4>
-                  <p>Have you tried mindfulness exercises during your breaks? It helped me a lot!</p>
-                </div>
-              </div>
-            </div>
-            <div class="add-comment">
-              <input type="text" placeholder="Add a supportive comment..." class="comment-input">
-              <button class="send-btn">Send</button>
-            </div>
+      <!-- Main content area with tab panels -->
+      <section class="community-content">
+        <!-- All Posts Tab Panel -->
+        <div class="tab-panel active" id="all-posts-panel">
+          <div class="thread-filters">
+            <button class="filter-btn active" data-filter="recent">Recent</button>
+            <button class="filter-btn" data-filter="popular">Popular</button>
+            <button class="filter-btn" data-filter="support-needed">Support Needed</button>
           </div>
 
-          <div class="thread">
-            <div class="thread-header">
-              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=8" alt="Avatar" class="avatar">
-              <div class="thread-meta">
-                <h3>David L.</h3>
-                <span>3 hours ago</span>
-              </div>
+          <div class="threads-container">
+            <!-- Posts will be dynamically loaded here -->
+          </div>
+        </div>
+
+        <!-- Habit Support Groups Tab Panel -->
+        <div class="tab-panel" id="support-groups-panel">
+          <div class="support-groups-container">
+            <!-- Support groups will be dynamically loaded here -->
+          </div>
+        </div>
+
+        <!-- Success Stories Tab Panel -->
+        <div class="tab-panel" id="success-stories-panel">
+          <div class="featured-stories">
+            <h2>Featured Success Stories</h2>
+            <div class="featured-stories-container">
+              <!-- Featured stories will be dynamically loaded here -->
             </div>
-            <div class="thread-content">
-              <p>Celebrating 6 months of therapy! It's been a journey, but I'm proud of how far I've come. 🎉</p>
-            </div>
-            <div class="thread-actions">
-              <button class="action-btn">❤️ Support (45)</button>
-              <button class="action-btn">💭 Comment (12)</button>
-              <button class="action-btn">🔗 Share</button>
+          </div>
+          <div class="all-stories">
+            <h2>All Success Stories</h2>
+            <div class="all-stories-container">
+              <!-- All success stories will be dynamically loaded here -->
             </div>
           </div>
         </div>
       </section>
+
+      <!-- Post template (hidden, will be cloned for each post) -->
+      <template id="post-template">
+        <div class="thread">
+          <div class="thread-header">
+            <img src="" alt="Avatar" class="avatar">
+            <div class="thread-meta">
+              <h3 class="author-name"></h3>
+              <span class="post-time"></span>
+              <span class="post-type-badge"></span>
+              <span class="habit-category-badge"></span>
+            </div>
+          </div>
+          <div class="thread-title"></div>
+          <div class="thread-content">
+            <p class="post-content"></p>
+            <div class="milestone-achievement"></div>
+          </div>
+          <div class="thread-actions">
+            <button class="action-btn support-btn" data-reaction="support">❤️ Support (<span class="support-count">0</span>)</button>
+            <button class="action-btn helpful-btn" data-reaction="helpful">👍 Helpful (<span class="helpful-count">0</span>)</button>
+            <button class="action-btn insightful-btn" data-reaction="insightful">💡 Insightful (<span class="insightful-count">0</span>)</button>
+            <button class="action-btn comment-btn">💭 Comment (<span class="comment-count">0</span>)</button>
+          </div>
+          <div class="comments-section">
+            <!-- Comments will be dynamically added here -->
+          </div>
+          <div class="add-comment">
+            <input type="text" placeholder="Add a supportive comment..." class="comment-input">
+            <button class="send-btn">Send</button>
+          </div>
+        </div>
+      </template>
+
+      <!-- Comment template (hidden, will be cloned for each comment) -->
+      <template id="comment-template">
+        <div class="comment">
+          <img src="" alt="Avatar" class="avatar-small">
+          <div class="comment-content">
+            <h4 class="comment-author"></h4>
+            <p class="comment-text"></p>
+            <div class="comment-actions">
+              <button class="comment-reaction-btn" data-reaction="support">❤️ <span class="comment-support-count">0</span></button>
+              <button class="comment-reaction-btn" data-reaction="helpful">👍 <span class="comment-helpful-count">0</span></button>
+              <button class="comment-reaction-btn" data-reaction="insightful">💡 <span class="comment-insightful-count">0</span></button>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- Support Group template (hidden, will be cloned for each group) -->
+      <template id="support-group-template">
+        <div class="support-group">
+          <div class="support-group-header">
+            <h3 class="group-name"></h3>
+            <span class="group-stats"><span class="member-count"></span> members • <span class="post-count"></span> posts</span>
+          </div>
+          <div class="support-group-preview">
+            <div class="recent-post">
+              <!-- Most recent post preview will be shown here -->
+            </div>
+          </div>
+          <button class="join-group-btn">Join Group</button>
+        </div>
+      </template>
     </main>
 
     <footer>
@@ -136,5 +225,6 @@
     </footer>
 
     <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/community.js"></script>
   </body>
 </html>
